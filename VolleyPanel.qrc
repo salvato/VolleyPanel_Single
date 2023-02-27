@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>ball2.png</file>
+        <file>Logo_UniMe.png</file>
+        <file>myLogo.png</file>
+        <file>SSD_UniMe.png</file>
+        <file>myLogo.ico</file>
+        <file>Logo.ico</file>
+        <file>VolleyPanel_en_US.ts</file>
+    </qresource>
+</RCC>
