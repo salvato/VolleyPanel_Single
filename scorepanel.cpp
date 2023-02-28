@@ -49,6 +49,11 @@ ScorePanel::ScorePanel(QFile *myLogFile, QWidget *parent)
     , iCurrentSlide(0)
     , pMySlideWindow(new SlideWindow())
     , pPanel(nullptr)
+#ifdef Q_OS_WINDOWS
+    , sPlayer(QString("ffplay.exe"))
+#else
+    , sPlayer(QString("/usr/bin/ffplay"))
+#endif
 
 {
     QList<QScreen*> screens = QApplication::screens();
@@ -282,7 +287,8 @@ void
 ScorePanel::onPanelServerSocketError(QAbstractSocket::SocketError error) {
     Q_UNUSED(error)
     refreshTimer.stop();
-    pPanelServerSocket->close();
+    if(pPanelServerSocket->isValid())
+        pPanelServerSocket->close();
     connectionTimer.start(1000);
 }
 
@@ -410,7 +416,6 @@ ScorePanel::onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus) {
                 this, SLOT(onStartNextSpot(int,QProcess::ExitStatus)));
     }
 
-    QString sCommand = "/usr/bin/ffplay";
     QStringList sArguments;
     sArguments = QStringList{"-noborder",
                              "-sn",
@@ -431,7 +436,7 @@ ScorePanel::onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus) {
     }
     sArguments.append(spotList.at(iCurrentSpot).absoluteFilePath());
 
-    videoPlayer->start(sCommand, sArguments);
+    videoPlayer->start(sPlayer, sArguments);
 #ifdef LOG_VERBOSE
     logMessage(logFile,
                Q_FUNC_INFO,
@@ -715,7 +720,6 @@ ScorePanel::startSpotLoop() {
             connect(videoPlayer, SIGNAL(finished(int,QProcess::ExitStatus)),
                     this, SLOT(onStartNextSpot(int,QProcess::ExitStatus)));
 
-            QString sCommand = "/usr/bin/ffplay";
             QStringList sArguments;
             sArguments = QStringList{"-noborder",
                                      "-sn",
@@ -736,7 +740,7 @@ ScorePanel::startSpotLoop() {
             }
             sArguments.append(spotList.at(iCurrentSpot).absoluteFilePath());
 
-            videoPlayer->start(sCommand, sArguments);
+            videoPlayer->start(sPlayer, sArguments);
 #ifdef LOG_VERBOSE
             logMessage(logFile,
                        Q_FUNC_INFO,

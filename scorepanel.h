@@ -136,4 +136,5 @@ private:
 private:
     QSettings         *pSettings;
     QWidget           *pPanel;
+    QString            sPlayer;
 };
